@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('no_transaction');
+            $table->string('name');
+            $table->string('snap_token');
+            $table->integer('qty');
+            $table->integer('price');
+            $table->bigInteger('grand_total');
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }
