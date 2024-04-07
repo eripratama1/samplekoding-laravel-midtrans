@@ -26,15 +26,15 @@
                                 </div>
                                 <div class="form-group my-3">
                                     <label for="">qty</label>
-                                    <input type="number" name="qty" class="form-control" id="">
+                                    <input type="number" name="qty" class="form-control" id="qty">
                                 </div>
                                 <div class="form-group my-3">
                                     <label for="">price</label>
-                                    <input type="number" name="price" class="form-control" id="">
+                                    <input type="number" name="price" class="form-control" id="price">
                                 </div>
                                 <div class="form-group my-3">
                                     <label for="">Grand total</label>
-                                    <input type="number" name="grand_total" class="form-control" id="">
+                                    <input type="number" name="grand_total" class="form-control" id="grand_total">
                                 </div>
 
                                 <div class="form-group my-3">
@@ -88,6 +88,19 @@
     <script
         src="{{ !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/snap.js' : 'https://app.midtrans.com/snap/snap.js' }}"
         data-client-key="{{ config('services.midtrans.clientKey') }}">
+    </script>
+
+    <script>
+        function count() {
+            var price = $('#price').val()
+            var qty   = $('#qty').val()
+            var grandTotal = price * qty
+            $('#grand_total').val(grandTotal)
+        }
+
+        $(document).on('keyup mouseup','#price', function () {
+            count()
+        });
     </script>
 </body>
 

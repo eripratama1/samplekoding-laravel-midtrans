@@ -22,7 +22,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        return view('order',['orders' => Order::latest()->get()]);
+        return view('order', ['orders' => Order::latest()->get()]);
     }
 
     public function payment(Request $request)
@@ -93,5 +93,73 @@ class OrderController extends Controller
 
         $order->save();
         return to_route('order');
+    }
+
+    public function notificationHandler(Request $request)
+    {
+        /**
+         * Dapatkan isi notifikasi dari request
+         */
+        $payload = $request->getContent();
+
+        /**
+         * Dapatkan isi dari request payload
+         */
+        $notification = json_decode($payload);
+
+        /**
+         * Ekstrak data notifikasi
+         */
+        $transaction_status = $notification->transaction_status;
+        $payment_type = $notification->payment_type;
+        $orderId = $notification->order_id;
+        $fraud = $notification->fraud_status;
+
+        /**
+         * Cari data transaksi (no_transactin) berdasarkan orderId dari request
+         *
+         */
+        $data = Order::where('no_transaction', $orderId)->first();
+
+        /**
+         * Perbarui status pesanan berdasarkan status yang didapat dari callback
+         */
+        if ($transaction_status == 'capture') {
+            if ($payment_type == 'credit_card') {
+                if ($fraud == 'challenge') {
+                    $data->update([
+                        'status' => 'pending'
+                    ]);
+                } else {
+                    $data->update([
+                        'status' => 'settlement'
+                    ]);
+                }
+            }
+        } elseif ($transaction_status == 'settlement') {
+            $data->update([
+                'status' => 'settlement'
+            ]);
+        } elseif ($transaction_status == 'pending') {
+            $data->update([
+                'status' => 'pending'
+            ]);
+        } elseif ($transaction_status == 'deny') {
+            $data->update([
+                'status' => 'denied'
+            ]);
+        } elseif ($transaction_status == 'settlement') {
+            $data->update([
+                'status' => 'settlement'
+            ]);
+        } elseif ($transaction_status == 'expire') {
+            $data->update([
+                'status' => 'expired'
+            ]);
+        } elseif ($transaction_status == 'cancel') {
+            $data->update([
+                'status' => 'canceled'
+            ]);
+        }
     }
 }

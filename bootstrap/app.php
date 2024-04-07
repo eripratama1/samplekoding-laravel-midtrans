@@ -11,7 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        /**
+         * Melakukan pengecualian penggunaaan csrf_token
+         * pada route notification
+         */
+        $middleware->validateCsrfTokens(except:[
+            '/notification'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
